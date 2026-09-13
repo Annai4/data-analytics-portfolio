@@ -1,0 +1,117 @@
+-- ======================================================================
+-- Topic: Advanced SQL Queries (CASE, IF, String Functions, Sorting, Pagination)
+-- Database: Northwind
+-- ======================================================================
+USE northwind;
+
+-- 1. Classify products by their standard_cost into categories: 
+-- 'Expensive' (> 50), 'Medium' (20 to 50), 'Cheap' (<= 20).
+SELECT product_name, standard_cost,
+    CASE
+        WHEN standard_cost > 50 THEN 'Expensive'
+        WHEN standard_cost <= 50 AND standard_cost > 20 THEN 'Medium'
+        ELSE 'Cheap'
+    END AS category
+FROM products;
+
+-- 2. Set discount for customers based on their region (state_province).
+-- 'WA', 'CA' - 5%, 'ID', 'OR' - 7%, 'UT', 'NV' - 13%, Others - 0%.
+SELECT id, last_name, first_name, state_province, 
+    CASE 
+        WHEN state_province IN ('WA', 'CA') THEN 5
+        WHEN state_province IN ('ID', 'OR') THEN 7
+        WHEN state_province IN ('UT', 'NV') THEN 13
+        ELSE 0
+    END AS discount
+FROM customers;
+
+-- 3. Determine order status based on shipped_date and order_date.
+SELECT id, shipped_date, order_date,
+    CASE
+        WHEN shipped_date IS NULL THEN 'Pending'
+        WHEN shipped_date = order_date THEN 'Shipped on Order Date'
+        ELSE 'Shipped'
+    END AS order_status
+FROM orders;
+
+-- 4. Classify products using the IF function: 'Expensive' (> 20), otherwise 'Affordable'.
+SELECT product_name, id, category,
+    IF(standard_cost > 20, 'Expensive', 'Affordable') AS price_category
+FROM products;
+
+-- 5. Concatenate first and last names into a single column.
+SELECT CONCAT(first_name, ' ', last_name) AS full_name
+FROM employees;
+
+-- 6. Replace NULL values in the 'notes' column with 'Not filled' using COALESCE.
+SELECT notes, COALESCE(notes, 'Not filled') AS cleaned_notes
+FROM employees;
+
+-- ======================================================================
+-- Sorting and Pagination (ORDER BY, LIMIT, OFFSET)
+-- ======================================================================
+
+-- 7. Sort products by standard_cost in descending order.
+SELECT product_name, standard_cost
+FROM products
+ORDER BY standard_cost DESC;
+
+-- 8. Sort products by standard_cost and list_price in ascending order.
+SELECT product_name, standard_cost, list_price
+FROM products
+ORDER BY standard_cost ASC, list_price ASC;
+
+-- 9. Sort customers by company, then by city in alphabetical order.
+SELECT company, last_name, first_name, city
+FROM customers
+ORDER BY company ASC, city ASC;
+
+-- 10. Select the 5 cheapest products.
+SELECT product_name, standard_cost 
+FROM products
+ORDER BY standard_cost ASC
+LIMIT 5;
+
+-- 11. Select the IDs of the 10 most recent orders.
+SELECT id
+FROM orders
+ORDER BY order_date DESC
+LIMIT 10;
+
+-- 12. Pagination: Select products for the second page (10 items per page).
+SELECT product_name 
+FROM products
+ORDER BY product_name
+LIMIT 10 OFFSET 10;
+
+-- 13. Select unique cities where customers are located.
+SELECT DISTINCT city  
+FROM customers;
+
+-- ======================================================================
+-- Complex Filtering and Calculations
+-- ======================================================================
+
+-- 14. Add a category column based on quantity using CASE and IF.
+SELECT quantity,
+    CASE
+        WHEN quantity < 20 THEN 'Almost finished'
+        ELSE 'Enough'
+    END AS category_case,
+    IF(quantity < 20, 'Almost finished', 'Enough') AS category_if
+FROM inventory_transactions;
+
+-- 15. Filter purchase orders (90 to 100) and categorize them by quantity using IF.
+SELECT *,
+    IF(quantity < 30, 'small', IF(quantity <= 70, 'medium', 'large')) AS size_category
+FROM purchase_order_details
+WHERE purchase_order_id BETWEEN 90 AND 100;
+
+-- 16. Extract Year and Month from order_date in 'YYYY-MM' format.
+SELECT LEFT(order_date, 7) AS year_month
+FROM orders;
+
+-- 17. Calculate total_price as quantity * unit_cost where purchase_order_id is missing.
+SELECT *, (quantity * unit_cost) AS total_price
+FROM purchase_order_details
+WHERE purchase_order_id IS NULL;
