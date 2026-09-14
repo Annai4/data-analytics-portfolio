@@ -1,0 +1,29 @@
+"""
+======================================================================
+Topic: Basic Algorithms & Input/Output
+Task: Sum of Three Numbers
+Time Complexity: O(1) - Constant time, as operations do not scale with input size.
+Space Complexity: O(1) - Constant space, uses a fixed amount of memory.
+======================================================================
+"""
+
+def sum_three_numbers(a: int, b: int, c: int) -> int:
+    """
+    Takes three integer numbers and returns their sum.
+    
+    Pseudocode logic:
+    1. Input: numbers a, b, c
+    2. Process: sum = a + b + c
+    3. Output: return sum
+    """
+    return a + b + c
+
+
+# --- Execution and Test Cases ---
+if __name__ == "__main__":
+    num1 = 5
+    num2 = 18
+    num3 = 67
+    
+    total_sum = sum_three_numbers(num1, num2, num3)
+    print(f"The sum of {num1}, {num2}, and {num3} is: {total_sum}")
